@@ -8,19 +8,18 @@ So handhaben wir Branching und Versionierung bei Applikationen. Applikationen si
 
 Applikationen nutzen ein gestuftes Branch-Modell. Die Anzahl der Stufen ist flexibel — manche Teams nutzen zwei, andere vier. Das Prinzip ist immer dasselbe:
 
-**Merges fließen nach unten. Fixes fließen nur per Cherry-Pick nach oben.**
+**Es gibt zwei Richtungen, und jede hat ihren eigenen Mechanismus.**
 
 ```
-master          (Entwicklung — auto-deploy auf Dev-Umgebung)
-  │
-  ├── merge ↓
-  │
-  staging-1.96  (Vorproduktion — auto-deploy auf Staging)
-  │
-  ├── merge ↓
-  │
-  release-1.96  (Produktion — manueller Deploy-Trigger)
+                  Richtung Stabilisierung →
+master ──────────── staging-1.96 ──────────── release-1.96
+  (Entwicklung)       (Vorproduktion)           (Produktion)
+                  ← Richtung Entwicklung
 ```
+
+- **Richtung Stabilisierung** (master → staging → release): neue Features und Code fließen per **Merge** in diese Richtung.
+- **Richtung Entwicklung** (release → staging → master): Fixes fließen per **Merge** zurück in diese Richtung.
+- **Cherry-Pick**: nur nötig, wenn ein Fix von einem Branch näher an der Entwicklung auf einen Branch näher an der Produktion muss — z.B. ein Staging-Fix, der auch auf Release kritisch ist. Noch besser: wenn ein Fix auf Release gebraucht wird, gleich von Release branchen.
 
 ```
 master:  tag 1.96 ─── commits ─── tag 1.97 ─── commits
@@ -32,9 +31,7 @@ master:  tag 1.96 ─── commits ─── tag 1.97 ─── commits
                         fix → 1.96-2
 ```
 
-Ein Fix auf `release-1.96` kann in `staging-1.96` gemergt werden (nach unten). Aber ein Fix auf `staging-1.96` muss per Cherry-Pick nach `release-1.96` — oder besser: der Entwickler denkt vorher nach, von wo er brancht. Wird ein Fix auf Release gebraucht, dann Branch von Release.
-
-Stufen hinzufügen oder entfernen je nach Bedarf. Die Richtungsregel ändert sich nicht.
+Stufen hinzufügen oder entfernen je nach Bedarf. Die Richtungsregeln ändern sich nicht.
 
 ---
 
@@ -115,17 +112,17 @@ Wo man brancht, bestimmt wo der Fix landet:
 
 | Bug gefunden auf | Branch von | Fließt nach |
 |---|---|---|
-| Produktion | `release-X.Y` | merge → staging → master |
-| Staging | `staging-X.Y` | merge → master. Cherry-Pick nach Release wenn kritisch. |
-| Nur Dev | `master` | merge → staging wenn bereit |
+| Produktion | `release-X.Y` | Merge Richtung Entwicklung (→ staging → master) |
+| Staging | `staging-X.Y` | Merge Richtung Entwicklung (→ master). Cherry-Pick Richtung Stabilisierung (→ release) wenn kritisch. |
+| Nur Dev | `master` | Merge Richtung Stabilisierung (→ staging) wenn bereit |
 
-**Fix auf der niedrigsten Stufe wo der Bug existiert, dann nach unten mergen.** Nie nach oben mergen — das würde unfertige Arbeit mitziehen.
+**Fix auf der niedrigsten Stufe wo der Bug existiert.** Fixes fließen natürlich per Merge Richtung Entwicklung zurück. Ein Cherry-Pick ist nur nötig, wenn sie auch einen stabileren Branch erreichen müssen.
 
 Das ist eine der wichtigsten EGB-Gewohnheiten. Nicht den Fix zu hoch ansetzen, wenn der Bug weiter unten in der Kette existiert.
 
 ### 6. Zurückmergen
 
-Release-Fixes fließen per Merge nach unten zurück in Staging und Master. Null Konflikte, weil keine Versionsdateien geändert wurden:
+Release-Fixes fließen per Merge Richtung Entwicklung zurück (release → staging → master). Null Konflikte, weil keine Versionsdateien geändert wurden:
 
 ```bash
 git checkout staging-1.97

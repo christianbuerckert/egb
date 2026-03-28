@@ -8,19 +8,18 @@ This is how we handle application branching and versioning. Applications are dep
 
 Applications use a tiered branch model. The number of tiers is flexible — some teams use two, others four. The principle is always the same:
 
-**Merging flows downward. Fixes flow upward only via cherry-pick.**
+**There are two directions, and each has its own mechanism.**
 
 ```
-master          (development — auto-deploys to dev environment)
-  │
-  ├── merge ↓
-  │
-  staging-1.96  (pre-production — auto-deploys to staging)
-  │
-  ├── merge ↓
-  │
-  release-1.96  (production — manual deploy trigger)
+                    toward stabilization →
+master ──────────── staging-1.96 ──────────── release-1.96
+  (development)       (pre-production)          (production)
+                    ← toward development
 ```
+
+- **Toward stabilization** (master → staging → release): new features and code move this way, always via **merge**.
+- **Toward development** (release → staging → master): fixes flow back this way, also via **merge**.
+- **Cherry-pick**: only needed when a fix from a branch closer to development must reach a branch closer to production — e.g., a staging fix that's also critical on release. Better yet: if a fix is needed on release, branch off release in the first place.
 
 ```
 master:  tag 1.96 ─── commits ─── tag 1.97 ─── commits
@@ -32,9 +31,7 @@ master:  tag 1.96 ─── commits ─── tag 1.97 ─── commits
                         fix → 1.96-2
 ```
 
-A fix on `release-1.96` can be merged into `staging-1.96` (downward). But a fix on `staging-1.96` must be cherry-picked to `release-1.96` — or better, the developer thinks beforehand about where to branch from. If a fix is needed on release, branch off release.
-
-Add or remove tiers based on how many stabilization gates your process needs. The direction rule doesn't change.
+Add or remove tiers based on how many stabilization gates your process needs. The direction rules don't change.
 
 ---
 
@@ -115,17 +112,17 @@ Where you branch from determines where the fix lands:
 
 | Bug found on | Branch from | Flows to |
 |---|---|---|
-| Production | `release-X.Y` | merge → staging → master |
-| Staging | `staging-X.Y` | merge → master. Cherry-pick to release if critical. |
-| Dev only | `master` | merge → staging when ready |
+| Production | `release-X.Y` | merge back toward development (→ staging → master) |
+| Staging | `staging-X.Y` | merge back toward development (→ master). Cherry-pick toward stabilization (→ release) if critical. |
+| Dev only | `master` | merge toward stabilization (→ staging) when ready |
 
-**Fix at the lowest level where the bug exists, then merge downward.** Never merge upward — that would pull in unfinished work.
+**Fix at the lowest level where the bug exists.** Fixes naturally merge back toward development. They only need a cherry-pick if they must also reach a more stable branch.
 
 This is one of the most important EGB habits. Do not start the fix too high if the bug already exists lower in the chain.
 
 ### 6. Merge Back
 
-Release fixes flow back to staging and master via merge (downward). Zero conflicts because no version files were changed:
+Release fixes flow back toward development (release → staging → master) via merge. Zero conflicts because no version files were changed:
 
 ```bash
 git checkout staging-1.97

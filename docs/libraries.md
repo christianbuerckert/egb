@@ -30,9 +30,9 @@ Master always has a `SNAPSHOT` version in the build file. This is the **only** p
 <version>0.46-SNAPSHOT</version>
 ```
 
-Every commit to every branch publishes a SNAPSHOT artifact. Downstream projects that depend on the SNAPSHOT always get the latest.
+Every commit to every branch publishes a SNAPSHOT artifact. **Internal** downstream projects that are actively developing against the library always get the latest version for their integration testing.
 
-SNAPSHOTs are useful while a library is being adjusted and tested inside an application context. But they are a **moving target** — not a stable promise.
+SNAPSHOTs are **exclusively for internal development and integration**. They are a moving target — not a stable promise, and not a basis for external consumers.
 
 > No external consumer should rely on SNAPSHOT artifacts.
 

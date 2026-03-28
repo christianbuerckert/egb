@@ -6,6 +6,19 @@ EGB grew out of real frustration. We kept fighting the same problems: version bu
 
 At some point we tried something different: **name the version at the start of a cycle, not at the end.** That one change removed most of the pain. We've been using this model for years now without a single branching incident, and we're sharing it in case it helps other teams too.
 
+## Who This Is For
+
+EGB works well if your team:
+- ships applications **and** maintains libraries
+- releases regularly (sprints, continuous delivery, or somewhere in between)
+- is tired of merge conflicts in version files
+- needs optional stabilization stages (staging, release) but doesn't want GitFlow's overhead
+
+EGB is probably **not** for you if:
+- you ship a single open-source library with no deployment pipeline — plain SemVer tagging is simpler
+- you're a solo developer with one branch — you don't need a branching model
+- your organization requires strict SemVer for deployed applications — EGB intentionally avoids that
+
 ## The Core Idea
 
 **Set the version at the beginning, not the end.**

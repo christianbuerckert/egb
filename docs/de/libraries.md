@@ -30,9 +30,9 @@ Master hat immer eine `SNAPSHOT`-Version in der Build-Datei. Das ist die **einzi
 <version>0.46-SNAPSHOT</version>
 ```
 
-Jeder Commit auf jedem Branch publiziert ein SNAPSHOT-Artefakt. Downstream-Projekte, die vom SNAPSHOT abhängen, bekommen immer die neueste Version.
+Jeder Commit auf jedem Branch publiziert ein SNAPSHOT-Artefakt. **Interne** Downstream-Projekte, die aktiv gegen die Library entwickeln, bekommen so immer die neueste Version für ihre Integrationstests.
 
-SNAPSHOTs sind nützlich, während eine Library im Applikationskontext angepasst und getestet wird. Aber sie sind ein **bewegliches Ziel** — kein stabiles Versprechen.
+Wichtig: SNAPSHOTs sind **ausschließlich für die interne Entwicklung und Integration** gedacht. Sie sind ein bewegliches Ziel — kein stabiles Versprechen, und keine Grundlage für externe Konsumenten.
 
 > Kein externer Konsument sollte sich auf SNAPSHOT-Artefakte verlassen.
 
